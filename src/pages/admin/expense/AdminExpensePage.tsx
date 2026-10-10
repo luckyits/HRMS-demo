@@ -1,0 +1,1 @@
+export { AdminExpenseFinancePage as AdminExpensePage } from '../finance/AdminExpenseFinancePage'

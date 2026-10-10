@@ -1,0 +1,1 @@
+export { ApprovalInboxPage as ManagerExpenseApprovalsPage } from './ApprovalInboxPage'
