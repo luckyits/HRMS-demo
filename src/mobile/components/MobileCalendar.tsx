@@ -3,12 +3,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export interface CalendarDayStatus {
   date: string // "YYYY-MM-DD"
-  status: 'P' | 'A' | 'L' | 'H' | 'WO' // Present, Absent, Leave, Holiday, Weekly Off
+  status: 'P' | 'A' | 'HD' | 'L' | 'H' | 'WO' // Present, Absent, Half day, Leave, Holiday, Weekly Off
   label?: string
 }
 
 interface MobileCalendarProps {
-  dayStatuses?: Record<string, 'P' | 'A' | 'L' | 'H' | 'WO'>
+  dayStatuses?: Record<string, 'P' | 'A' | 'HD' | 'L' | 'H' | 'WO'>
   onSelectDate?: (dateStr: string) => void
   selectedDate?: string
 }
@@ -47,6 +47,8 @@ export const MobileCalendar: React.FC<MobileCalendarProps> = ({
         return <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
       case 'A':
         return <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+      case 'HD':
+        return <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
       case 'L':
         return <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
       case 'H':
@@ -127,22 +129,30 @@ export const MobileCalendar: React.FC<MobileCalendarProps> = ({
       </div>
 
       {/* Legend */}
-      <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-around text-[10px] font-medium text-muted-foreground">
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+      <div className="mt-4 pt-3 border-t border-border/60 grid grid-cols-3 gap-2 text-[10px] font-medium text-muted-foreground">
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
           <span>Present</span>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-rose-500" />
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
           <span>Absent</span>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-amber-500" />
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0" />
+          <span>Half day</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
           <span>Leave</span>
         </div>
-        <div className="flex items-center gap-1">
-          <span className="w-2 h-2 rounded-full bg-indigo-500" />
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
           <span>Holiday</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <span className="w-2 h-2 rounded-full bg-muted-foreground/40 shrink-0" />
+          <span>Weekly off</span>
         </div>
       </div>
     </div>

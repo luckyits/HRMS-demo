@@ -122,13 +122,16 @@ export function getCompanyTemplateToggles(companyType: CompanyType): Record<stri
       }
 
     case 'Small Shop':
-      // Minimal essentials only
+      // Minimal essentials only: Punch, Leave and Payslip
       return {
         PUNCH: { state: 'Allow' },
         LEAVE: { state: 'Allow' },
         PAYSLIP: { state: 'Allow' },
         PROFILE: { state: 'Allow' },
         HOLIDAY: { state: 'Allow' },
+        REGULARIZATION: { state: 'Deny', locked: true },
+        EXPENSE: { state: 'Deny', locked: true },
+        FINANCE: { state: 'Deny', locked: true },
         VISIT: { state: 'Deny', locked: true },
         OVERTIME: { state: 'Deny', locked: true },
         TIMESHEET: { state: 'Deny', locked: true },
@@ -137,6 +140,8 @@ export function getCompanyTemplateToggles(companyType: CompanyType): Record<stri
         TEAM_REPORTS: { state: 'Deny', locked: true },
         ASSET: { state: 'Deny', locked: true },
         RECRUITMENT: { state: 'Deny', locked: true },
+        BIRTHDAY_ANNIV: { state: 'Deny', locked: true },
+        ANNOUNCEMENT: { state: 'Deny', locked: true },
       }
 
     case 'Hospital':

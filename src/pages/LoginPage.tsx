@@ -1,4 +1,8 @@
 import { useDemo } from '@/context/DemoContext'
+import { useIsMobile } from '@/hooks/useIsMobile'
+import { PhoneFrame } from '@/mobile/layout/PhoneFrame'
+import { MobileLoginPage } from '@/mobile/pages/MobileLoginPage'
+import { DemoSwitcher } from '@/components/common/DemoSwitcher'
 import {
   ArrowRight,
   CheckCircle2,
@@ -17,11 +21,32 @@ import { useNavigate } from 'react-router-dom'
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate()
   const { setRole, setEmployeeType } = useDemo()
+  const { isMobile, isPhonePreview } = useIsMobile()
 
   const [authMethod, setAuthMethod] = useState<'password' | 'otp'>('password')
   const [empId, setEmpId] = useState('EMP-003')
   const [password, setPassword] = useState('demo1234')
   const [otp, setOtp] = useState('4829')
+
+  if (isPhonePreview) {
+    return (
+      <div className="relative min-h-screen w-full flex items-center justify-center bg-slate-950 overflow-auto">
+        <PhoneFrame>
+          <MobileLoginPage />
+        </PhoneFrame>
+        <DemoSwitcher />
+      </div>
+    )
+  }
+
+  if (isMobile) {
+    return (
+      <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground antialiased">
+        <MobileLoginPage />
+        <DemoSwitcher />
+      </div>
+    )
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

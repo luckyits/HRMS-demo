@@ -9,6 +9,8 @@ import { MobileTeamPage } from '@/mobile/pages/MobileTeamPage'
 import { MobileProfilePage } from '@/mobile/pages/MobileProfilePage'
 import { MobileMorePage } from '@/mobile/pages/MobileMorePage'
 
+import { MobileRegularizationPage } from '@/mobile/pages/MobileRegularizationPage'
+
 export const MobileViewResolver: React.FC = () => {
   const location = useLocation()
   const path = location.pathname.toLowerCase()
@@ -31,6 +33,11 @@ export const MobileViewResolver: React.FC = () => {
   // 3. Attendance & Punch
   if (path === '/employee/attendance') {
     return <MobileAttendancePage />
+  }
+
+  // Regularization Form
+  if (path === '/employee/regularization') {
+    return <MobileRegularizationPage />
   }
 
   // 4. Requests Hub
