@@ -18,7 +18,7 @@ import {
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-const ROLES: Role[] = ['HR Admin', 'Manager', 'Employee']
+const ROLES: Role[] = ['HR Admin', 'Branch HR', 'Manager', 'Employee']
 
 const EMPLOYEE_TYPES: EmployeeType[] = [
   'Office Staff',
@@ -242,7 +242,28 @@ export const DemoSwitcher: React.FC = () => {
             </div>
 
             {/* Quick Links & Reset Actions */}
-            <div className="pt-2 flex items-center gap-2">
+            <div className="pt-2 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false)
+                  window.dispatchEvent(new CustomEvent('start-demo-tour', { detail: { stepIndex: 0 } }))
+                }}
+                className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 rounded-lg transition border border-amber-200 dark:border-amber-900"
+              >
+                <span>Guided Tour</span>
+              </button>
+
+              <Link
+                to="/dev/mobile-qa"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 rounded-lg transition border border-indigo-200 dark:border-indigo-900"
+              >
+                <span>Mobile QA</span>
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-2">
               <Link
                 to="/dev/access"
                 onClick={() => setIsOpen(false)}

@@ -14,7 +14,11 @@ import {
   Info,
   CheckCircle2,
   Trash2,
-  ChevronRight
+  ChevronRight,
+  Zap,
+  Clock,
+  WifiOff,
+  Compass
 } from 'lucide-react'
 import { MobileHeader } from '@/mobile/components/MobileHeader'
 import { BottomSheet } from '@/mobile/components/BottomSheet'
@@ -35,6 +39,23 @@ export const MobileSettingsPage: React.FC = () => {
   const [appLockEnabled, setAppLockEnabled] = useState<boolean>(() => {
     return localStorage.getItem('hrms_mobile_app_lock') === 'true'
   })
+
+  const [liteMode, setLiteMode] = useState<boolean>(() => {
+    return localStorage.getItem('hrms_lite_mode') === 'true'
+  })
+
+  const toggleLiteMode = () => {
+    const nextVal = !liteMode
+    setLiteMode(nextVal)
+    localStorage.setItem('hrms_lite_mode', String(nextVal))
+    if (nextVal) {
+      document.documentElement.classList.add('lite-mode')
+      showToast('Lite mode enabled: animations disabled for low-end device performance', 'info')
+    } else {
+      document.documentElement.classList.remove('lite-mode')
+      showToast('Lite mode disabled', 'info')
+    }
+  }
 
   const [isWithdrawSheetOpen, setIsWithdrawSheetOpen] = useState(false)
 
@@ -160,6 +181,106 @@ export const MobileSettingsPage: React.FC = () => {
           >
             <div className="w-5 h-5 rounded-full bg-white shadow-sm" />
           </button>
+        </div>
+
+        {/* 3b. Lite Mode (Low-End Phones) */}
+        <div className="p-4 rounded-3xl bg-card border border-border shadow-2xs flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <Zap className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h4 className="text-sm font-bold text-foreground">
+                  Lite Mode (Low-End Phones)
+                </h4>
+                {liteMode && (
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-amber-500/15 text-amber-600">
+                    Active
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Disables animations & reduces GPU load
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleLiteMode}
+            className={`w-12 h-6 rounded-full transition-colors p-0.5 flex items-center ${
+              liteMode ? 'bg-amber-500 justify-end' : 'bg-muted justify-start'
+            }`}
+          >
+            <div className="w-5 h-5 rounded-full bg-white shadow-sm" />
+          </button>
+        </div>
+
+        {/* 3c. Mobile System Diagnostics & Lock */}
+        <div className="p-4 rounded-3xl bg-muted/30 border border-border space-y-2.5">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+            Mobile Security & Diagnostics
+          </span>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => navigate('/mobile/lock')}
+              className="p-2.5 rounded-2xl bg-card border border-border text-left hover:border-primary/40 active:scale-95 transition"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                <Lock className="w-3.5 h-3.5 text-primary" />
+                <span>Lock App Now</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground block mt-0.5">
+                Test 4-digit PIN lock
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/mobile/session-expired')}
+              className="p-2.5 rounded-2xl bg-card border border-border text-left hover:border-primary/40 active:scale-95 transition"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                <Clock className="w-3.5 h-3.5 text-amber-500" />
+                <span>Session Timeout</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground block mt-0.5">
+                Simulate 15m timeout
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/mobile/permissions')}
+              className="p-2.5 rounded-2xl bg-card border border-border text-left hover:border-primary/40 active:scale-95 transition"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                <Camera className="w-3.5 h-3.5 text-indigo-500" />
+                <span>Sensors & GPS</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground block mt-0.5">
+                Permissions guide
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('start-demo-tour', { detail: { stepIndex: 0 } }))
+              }}
+              className="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:border-amber-500/60 active:scale-95 transition"
+            >
+              <div className="flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400">
+                <Compass className="w-3.5 h-3.5" />
+                <span>Demo Tour</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground block mt-0.5">
+                Interactive walkthrough
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* 4. Privacy & DPDP Consent Management */}

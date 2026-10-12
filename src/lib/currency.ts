@@ -25,7 +25,7 @@ export const INR_EXCHANGE_RATES: Record<SupportedCurrency, number> = {
 export function formatCurrency(
   amountInInr: number,
   targetCurrency: SupportedCurrency = 'INR',
-  options?: { showSymbol?: boolean; decimals?: number }
+  options?: { showSymbol?: boolean; decimals?: number; locale?: 'en' | 'hi' | 'gu' }
 ): string {
   const showSymbol = options?.showSymbol ?? true
   const decimals = options?.decimals ?? 0
@@ -33,9 +33,11 @@ export function formatCurrency(
   const converted = amountInInr * rate
 
   const symbol = showSymbol ? CURRENCY_SYMBOLS[targetCurrency] : ''
+  const locale = options?.locale || 'en'
+  const loc = locale === 'hi' ? 'hi-IN' : locale === 'gu' ? 'gu-IN' : 'en-IN'
 
   if (targetCurrency === 'INR') {
-    return `${symbol}${converted.toLocaleString('en-IN', {
+    return `${symbol}${converted.toLocaleString(loc, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     })}`
@@ -45,6 +47,17 @@ export function formatCurrency(
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   })}`
+}
+
+/**
+ * Format a number with Indian numbering conventions (lakhs/crores) and language locales
+ */
+export function formatNumber(
+  num: number,
+  locale: 'en' | 'hi' | 'gu' = 'en'
+): string {
+  const loc = locale === 'hi' ? 'hi-IN' : locale === 'gu' ? 'gu-IN' : 'en-IN'
+  return num.toLocaleString(loc)
 }
 
 /**

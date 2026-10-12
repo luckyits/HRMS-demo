@@ -12,6 +12,7 @@ import {
   LucideIcon
 } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAccess } from '@/access/useAccess'
 import { useDemo } from '@/context/DemoContext'
 import { useWorkflow } from '@/context/WorkflowContext'
@@ -26,6 +27,7 @@ export interface TabItem {
 }
 
 export const BottomTabBar: React.FC = () => {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
   const { hasFeature } = useAccess()
@@ -37,6 +39,53 @@ export const BottomTabBar: React.FC = () => {
 
   // Build the 5 tabs dynamically based on effective access & role
   const getTabs = (): TabItem[] => {
+    // 1. HR Admin & Branch HR Dedicated Bottom Navigation
+    if (settings.role === 'HR Admin' || settings.role === 'Branch HR') {
+      const isBranchHr = settings.role === 'Branch HR'
+      const activeBranch = settings.currentUser.branch || 'Mumbai Branch'
+      const scopedPending = requests.filter((r) => {
+        if (r.status !== 'pending') return false
+        if (isBranchHr) {
+          return r.requesterBranch?.toLowerCase() === activeBranch.toLowerCase()
+        }
+        return true
+      }).length
+
+      return [
+        {
+          id: 'home',
+          label: 'HR Home',
+          to: '/hr/dashboard',
+          icon: Home,
+        },
+        {
+          id: 'approvals',
+          label: 'Approvals',
+          to: '/hr/approvals',
+          icon: ClipboardCheck,
+          badge: scopedPending > 0 ? scopedPending : undefined,
+        },
+        {
+          id: 'attendance',
+          label: 'Attendance',
+          to: '/hr/attendance',
+          icon: Clock,
+        },
+        {
+          id: 'employees',
+          label: 'People',
+          to: '/hr/employees',
+          icon: Users,
+        },
+        {
+          id: 'more',
+          label: 'More',
+          to: '/mobile/more',
+          icon: MoreHorizontal,
+        },
+      ]
+    }
+
     if (isManager) {
       const tabs: TabItem[] = [
         {
@@ -165,13 +214,16 @@ export const BottomTabBar: React.FC = () => {
         {tabs.map((tab) => {
           const active = isTabActive(tab)
           const Icon = tab.icon
+          const displayLabel = t(`mobile.tabs.${tab.id}`, tab.label)
 
           return (
             <button
               key={tab.id}
               type="button"
               onClick={() => navigate(tab.to)}
-              className={`relative flex flex-col items-center justify-center flex-1 h-full min-h-[48px] py-1 transition-all active:scale-90 ${
+              aria-label={displayLabel}
+              aria-current={active ? 'page' : undefined}
+              className={`relative flex flex-col items-center justify-center flex-1 h-full min-h-[48px] min-w-[48px] py-1 transition-all active:scale-95 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary ${
                 active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
               }`}
             >
@@ -180,6 +232,7 @@ export const BottomTabBar: React.FC = () => {
                   className={`w-5 h-5 transition-transform duration-200 ${
                     active ? 'stroke-[2.5px] scale-110' : 'stroke-[1.8px]'
                   }`}
+                  aria-hidden="true"
                 />
                 {tab.badge !== undefined && (
                   <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
@@ -188,11 +241,11 @@ export const BottomTabBar: React.FC = () => {
                 )}
               </div>
               <span
-                className={`text-[10px] tracking-tight mt-1 transition-all ${
+                className={`text-[10px] tracking-tight mt-1 truncate max-w-[68px] text-center transition-all ${
                   active ? 'font-bold' : 'font-medium'
                 }`}
               >
-                {tab.label}
+                {displayLabel}
               </span>
 
               {/* Active pill dot */}

@@ -55,7 +55,15 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     let avatar = 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80'
     let empId = 'HR-00101'
 
-    if (role === 'Manager') {
+    let branch = 'Headquarters - Tech Park'
+
+    if (role === 'Branch HR') {
+      userName = 'Priya Sharma'
+      userTitle = 'Branch People Operations Lead'
+      avatar = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80'
+      empId = 'BHR-00108'
+      branch = 'Mumbai Branch'
+    } else if (role === 'Manager') {
       userName = 'Vikram Malhotra'
       userTitle = 'Engineering & Ops Manager'
       avatar = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80'
@@ -76,6 +84,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         title: userTitle,
         avatar,
         empId,
+        branch,
       }
     }))
   }

@@ -1,4 +1,4 @@
-export type Role = 'HR Admin' | 'Manager' | 'Employee'
+export type Role = 'HR Admin' | 'Branch HR' | 'Manager' | 'Employee'
 
 export type EmployeeType = 
   | 'Office Staff' 

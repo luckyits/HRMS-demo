@@ -75,3 +75,32 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Lite Mode for low-end mobile devices: disables animations and transitions */
+.lite-mode, .lite-mode * {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Mobile Safe Area & Input Polish */
+@supports (padding: max(0px)) {
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 16px), 16px);
+  }
+}
+
+/* Ensure no horizontal page scroll on mobile screens */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* 48px Mobile Tap Target Helper */
+.tap-target-48 {
+  min-height: 48px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

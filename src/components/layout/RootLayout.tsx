@@ -1,4 +1,5 @@
 import { DemoSwitcher } from '@/components/common/DemoSwitcher'
+import { GuidedDemoTour } from '@/components/common/GuidedDemoTour'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { TopBar } from '@/components/layout/TopBar'
 import { useIsMobile } from '@/hooks/useIsMobile'
@@ -23,6 +24,7 @@ export const RootLayout: React.FC = () => {
 
         {/* Floating Demo Persona Switcher */}
         <DemoSwitcher />
+        <GuidedDemoTour />
       </div>
     )
   }
@@ -37,6 +39,7 @@ export const RootLayout: React.FC = () => {
 
         {/* Floating Demo Persona Switcher */}
         <DemoSwitcher />
+        <GuidedDemoTour />
       </div>
     )
   }
@@ -62,6 +65,7 @@ export const RootLayout: React.FC = () => {
 
       {/* Floating Demo Persona Switcher */}
       <DemoSwitcher />
+      <GuidedDemoTour />
     </div>
   )
 }

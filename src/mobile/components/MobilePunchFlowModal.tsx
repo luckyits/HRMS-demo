@@ -20,6 +20,7 @@ import { useAccess } from '@/access/useAccess'
 import { useDemo } from '@/context/DemoContext'
 import { useAttendance } from '@/context/AttendanceContext'
 import { useToast } from '@/context/ToastContext'
+import { useOfflineQueue } from '@/context/OfflineQueueContext'
 import { TrackingIndicator } from '@/mobile/components/TrackingIndicator'
 import { BottomSheet } from '@/mobile/components/BottomSheet'
 
@@ -40,6 +41,7 @@ export const MobilePunchFlowModal: React.FC<MobilePunchFlowModalProps> = ({
   const { settings } = useDemo()
   const { hasConsent, setConsent, recordPunch } = useAttendance()
   const { showToast } = useToast()
+  const { enqueueItem } = useOfflineQueue()
 
   // Steps: 'consent' -> 'selfie' -> 'geofence' -> 'success'
   const [currentStep, setCurrentStep] = useState<'consent' | 'selfie' | 'geofence' | 'success'>('consent')
@@ -182,17 +184,19 @@ export const MobilePunchFlowModal: React.FC<MobilePunchFlowModalProps> = ({
 
     // Save offline or normal
     if (isOffline) {
-      try {
-        const existing = JSON.parse(localStorage.getItem('hrms_offline_punches') || '[]')
-        existing.push({
+      enqueueItem({
+        idempotencyKey: `punch-${punchType}-${currentEmployee.id}-${punchTime.replace(/[^0-9]/g, '')}`,
+        type: 'punch',
+        title: `Offline Punch-${punchType} (${punchTime})`,
+        subtitle: isRemote ? 'Remote Home Location' : 'Bengaluru Tech Park - Gate 2',
+        payload: {
+          punchType,
           time: punchTime,
-          type: punchType,
+          isOffline: true,
           employeeId: currentEmployee.id,
           location: isRemote ? 'Remote Home Location' : 'Bengaluru Tech Park - Gate 2',
-          savedAt: new Date().toISOString(),
-        })
-        localStorage.setItem('hrms_offline_punches', JSON.stringify(existing))
-      } catch {}
+        },
+      })
       showToast('Saved offline. Will sync automatically when network restores.', 'warning')
     } else {
       recordPunch({

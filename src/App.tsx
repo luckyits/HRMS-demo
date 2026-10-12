@@ -18,6 +18,7 @@ import { ComplianceEngagementProvider } from './context/ComplianceEngagementCont
 import { ReportsProvider } from './context/ReportsContext'
 import { SystemSettingsProvider } from './context/SystemSettingsContext'
 import { OptionalModulesProvider } from './context/OptionalModulesContext'
+import { OfflineQueueProvider } from './context/OfflineQueueContext'
 import { ToastProvider } from './context/ToastContext'
 import { ToastContainer } from './components/common/ToastContainer'
 import './i18n'
@@ -28,7 +29,8 @@ export function App() {
     <ThemeProvider>
       <ToastProvider>
         <DemoProvider>
-          <FeatureControlProvider>
+          <OfflineQueueProvider>
+            <FeatureControlProvider>
             <RoleProvider>
               <AttendanceProvider>
                 <AdminAttendanceProvider>
@@ -66,6 +68,7 @@ export function App() {
               </AttendanceProvider>
             </RoleProvider>
           </FeatureControlProvider>
+          </OfflineQueueProvider>
         </DemoProvider>
       </ToastProvider>
     </ThemeProvider>

@@ -21,7 +21,8 @@ import {
   FileSpreadsheet,
   Moon,
   ShieldCheck,
-  WifiOff
+  WifiOff,
+  CreditCard
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useDemo } from '@/context/DemoContext'
@@ -34,6 +35,7 @@ import { TrackingIndicator } from '@/mobile/components/TrackingIndicator'
 import { PullToRefresh } from '@/mobile/components/PullToRefresh'
 import { MobilePunchFlowModal } from '@/mobile/components/MobilePunchFlowModal'
 import { MobileRosterStrip } from '@/mobile/components/MobileRosterStrip'
+import { PwaInstallPromptCard } from '@/mobile/components/PwaInstallPromptCard'
 import { useToast } from '@/context/ToastContext'
 
 export const MobileHomePage: React.FC = () => {
@@ -127,6 +129,9 @@ export const MobileHomePage: React.FC = () => {
               className="w-12 h-12 rounded-full object-cover border-2 border-primary/20 shrink-0 shadow-xs"
             />
           </div>
+
+          {/* PWA Add to Home Screen Prompt Card */}
+          <PwaInstallPromptCard />
 
           {/* Today's Shift Card (Supports Night Shift note) */}
           <div className="p-4 rounded-3xl bg-card border border-border shadow-2xs space-y-2">
@@ -329,6 +334,30 @@ export const MobileHomePage: React.FC = () => {
                   iconColor="text-indigo-600 dark:text-indigo-400"
                   iconBg="bg-indigo-50 dark:bg-indigo-950/40"
                   onClick={() => navigate('/employee/timesheets')}
+                />
+              )}
+
+              {hasFeature('INCENTIVE') && (
+                <ActionTile
+                  icon={TrendingUp}
+                  label="Sales Commissions & Incentives"
+                  subtitle="86% target met • ₹21,500 accrued"
+                  badge="Incentive"
+                  badgeVariant="warning"
+                  iconColor="text-amber-600 dark:text-amber-400"
+                  iconBg="bg-amber-50 dark:bg-amber-950/40"
+                  onClick={() => navigate('/employee/incentive')}
+                />
+              )}
+
+              {hasFeature('FINANCE') && (
+                <ActionTile
+                  icon={CreditCard}
+                  label="Loans & Advances"
+                  subtitle="Apply for loan, EMI calculator"
+                  iconColor="text-purple-600 dark:text-purple-400"
+                  iconBg="bg-purple-50 dark:bg-purple-950/40"
+                  onClick={() => navigate('/employee/loans')}
                 />
               )}
             </div>

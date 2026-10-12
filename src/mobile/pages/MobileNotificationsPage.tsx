@@ -14,6 +14,7 @@ import { MobileHeader } from '@/mobile/components/MobileHeader'
 import { ChipFilterRow } from '@/mobile/components/ChipFilterRow'
 import { useToast } from '@/context/ToastContext'
 import { useAccess } from '@/access/useAccess'
+import { useNavigate } from 'react-router-dom'
 
 interface NotificationItem {
   id: string
@@ -95,15 +96,27 @@ export const MobileNotificationsPage: React.FC = () => {
     },
   ])
 
+  const navigate = useNavigate()
+
   const handleMarkAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, isUnread: false })))
     showToast('All notifications marked as read', 'info')
   }
 
-  const handleTapItem = (id: string) => {
+  const handleTapItem = (item: NotificationItem) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isUnread: false } : n))
+      prev.map((n) => (n.id === item.id ? { ...n, isUnread: false } : n))
     )
+
+    if (item.type === 'leave') {
+      navigate('/employee/leaves')
+    } else if (item.type === 'payroll') {
+      navigate('/employee/payslips')
+    } else if (item.type === 'policy') {
+      navigate('/employee/policies')
+    } else if (item.type === 'shift') {
+      navigate('/employee/attendance')
+    }
   }
 
   const filteredItems = notifications.filter((n) => {
@@ -181,7 +194,7 @@ export const MobileNotificationsPage: React.FC = () => {
                   {groupItems.map((item) => (
                     <div
                       key={item.id}
-                      onClick={() => handleTapItem(item.id)}
+                      onClick={() => handleTapItem(item)}
                       className={`p-4 rounded-3xl bg-card border transition-all cursor-pointer shadow-2xs space-y-2 ${
                         item.isUnread
                           ? 'border-primary/40 ring-1 ring-primary/20 bg-primary/5'

@@ -20,11 +20,15 @@ import { StickyActionBar } from '@/mobile/components/StickyActionBar'
 import { ApprovalTimeline, type ApprovalStep } from '@/components/common/ApprovalTimeline'
 import { useEss } from '@/context/EssContext'
 import { useAccess } from '@/access/useAccess'
+import { useDemo } from '@/context/DemoContext'
+import { useOfflineQueue } from '@/context/OfflineQueueContext'
 import { useToast } from '@/context/ToastContext'
 import type { LeaveRequest } from '@/mock/essData'
 
 export const MobileLeavePage: React.FC = () => {
   const { hasFeature } = useAccess()
+  const { settings } = useDemo()
+  const { enqueueItem } = useOfflineQueue()
   const { leaveBalances, leaveRequests, applyLeave, cancelLeaveRequest } = useEss()
   const { showToast } = useToast()
 
@@ -90,6 +94,21 @@ export const MobileLeavePage: React.FC = () => {
       reason,
       attachmentName: hasAttachment ? 'medical_certificate_scanned.pdf' : undefined,
     })
+
+    if (settings.offlineMode) {
+      enqueueItem({
+        idempotencyKey: `leave-${startDate}-${endDate}-${currentBalance.code}`,
+        type: 'leave',
+        title: `Offline Leave: ${currentBalance.type}`,
+        subtitle: `${calculatedDays} day(s) from ${startDate}`,
+        payload: {
+          leaveType: currentBalance.type,
+          startDate,
+          endDate,
+          daysCount: calculatedDays,
+        },
+      })
+    }
 
     showToast(`Leave application submitted for ${calculatedDays} day(s) of ${currentBalance.code}!`, 'success')
     setReason('')

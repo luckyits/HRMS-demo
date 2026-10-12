@@ -10,9 +10,16 @@ export interface ToastItem {
   duration?: number
 }
 
+export interface ToastOptions {
+  message?: string
+  title?: string
+  type?: ToastType
+  duration?: number
+}
+
 interface ToastContextType {
   toasts: ToastItem[]
-  showToast: (message: string, type?: ToastType, duration?: number) => void
+  showToast: (messageOrOptions: string | ToastOptions, type?: ToastType, duration?: number) => void
   removeToast: (id: string) => void
   success: (message: string) => void
   error: (message: string) => void
@@ -30,15 +37,28 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [])
 
   const showToast = useCallback(
-    (message: string, type: ToastType = 'info', duration: number = 3500) => {
+    (
+      messageOrOptions: string | ToastOptions,
+      type: ToastType = 'info',
+      duration: number = 3500
+    ) => {
+      const isObj = typeof messageOrOptions === 'object' && messageOrOptions !== null
+      const finalMessage = isObj
+        ? messageOrOptions.title
+          ? `${messageOrOptions.title}: ${messageOrOptions.message || ''}`
+          : messageOrOptions.message || ''
+        : messageOrOptions
+      const finalType = isObj && messageOrOptions.type ? messageOrOptions.type : type
+      const finalDuration = isObj && messageOrOptions.duration ? messageOrOptions.duration : duration
+
       const id = `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      const newToast: ToastItem = { id, message, type, duration }
+      const newToast: ToastItem = { id, message: finalMessage, type: finalType, duration: finalDuration }
       setToasts((prev) => [...prev, newToast])
 
-      if (duration > 0) {
+      if (finalDuration > 0) {
         setTimeout(() => {
           removeToast(id)
-        }, duration)
+        }, finalDuration)
       }
     },
     [removeToast]

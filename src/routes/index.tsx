@@ -91,6 +91,7 @@ import { MyTimesheetsPage } from '@/pages/ess/MyTimesheetsPage'
 import { EngagementPollsPage } from '@/pages/ess/EngagementPollsPage'
 import { ManagerTimesheetsPage } from '@/pages/manager/ManagerTimesheetsPage'
 import { DevQaPage } from '@/pages/dev/DevQaPage'
+import { MobileQaPage } from '@/pages/dev/MobileQaPage'
 import { MobileMorePage } from '@/mobile/pages/MobileMorePage'
 import React from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
@@ -254,6 +255,7 @@ export const AppRoutes: React.FC = () => {
         {/* Diagnostic Access Engine & QA Routes */}
         <Route path="/mobile/more" element={<MobileMorePage />} />
         <Route path="/dev/qa" element={<DevQaPage />} />
+        <Route path="/dev/mobile-qa" element={<MobileQaPage />} />
         <Route path="/dev/access" element={<AccessDebugPage />} />
 
         {/* Catch-all route */}

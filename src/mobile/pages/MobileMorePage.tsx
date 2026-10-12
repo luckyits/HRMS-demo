@@ -23,7 +23,12 @@ import {
   Activity,
   Layers,
   ChevronRight,
-  Gift
+  Gift,
+  Target,
+  Laptop,
+  Megaphone,
+  History,
+  Sliders,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAccess } from '@/access/useAccess'
@@ -38,6 +43,35 @@ export const MobileMorePage: React.FC = () => {
 
   const isManager = settings.role === 'Manager'
   const isAdmin = settings.role === 'HR Admin'
+  const isBranchHr = settings.role === 'Branch HR'
+  const isHr = isAdmin || isBranchHr
+
+  const hasAttendanceItems =
+    hasFeature('PUNCH') ||
+    hasFeature('SHIFT_ROSTER') ||
+    hasFeature('OVERTIME') ||
+    hasFeature('TIMESHEET') ||
+    hasFeature('VISIT')
+
+  const hasLeaveItems =
+    hasFeature('LEAVE') ||
+    hasFeature('CALENDAR') ||
+    hasFeature('BIRTHDAY_ANNIV')
+
+  const hasFinanceItems =
+    hasFeature('PAYSLIP') ||
+    hasFeature('EXPENSE') ||
+    hasFeature('FINANCE') ||
+    hasFeature('INCENTIVE')
+
+  const hasLearningItems =
+    hasFeature('TRAINING') ||
+    hasFeature('PERFORMANCE') ||
+    hasFeature('ASSET') ||
+    hasFeature('ENGAGEMENT') ||
+    hasFeature('HELPDESK') ||
+    hasFeature('POLICY') ||
+    hasFeature('RESIGNATION')
 
   return (
     <div className="flex flex-col min-h-full">
@@ -78,6 +112,77 @@ export const MobileMorePage: React.FC = () => {
           </div>
           <ChevronRight className="w-5 h-5 text-muted-foreground shrink-0" />
         </div>
+
+        {/* 0. HR Operations & People Operations Control (If HR Admin or Branch HR) */}
+        {isHr && (
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              HR People Operations & Control
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              <ActionTile
+                icon={ClipboardCheck}
+                label="HR Approvals Inbox"
+                subtitle="Leaves > 5d, loans, resignations & expenses"
+                badge="HR Scope"
+                badgeVariant="primary"
+                iconColor="text-indigo-600 dark:text-indigo-400"
+                iconBg="bg-indigo-50 dark:bg-indigo-950/40"
+                onClick={() => navigate('/hr/approvals')}
+              />
+              <ActionTile
+                icon={Clock}
+                label="Live Attendance & Flagged Punches"
+                subtitle="Branch muster & suspicious punch review"
+                iconColor="text-emerald-600 dark:text-emerald-400"
+                iconBg="bg-emerald-50 dark:bg-emerald-950/40"
+                onClick={() => navigate('/hr/attendance')}
+              />
+              <ActionTile
+                icon={Users}
+                label="Employee 360 Lookup"
+                subtitle="Search profiles, attendance, masked salary"
+                iconColor="text-blue-600 dark:text-blue-400"
+                iconBg="bg-blue-50 dark:bg-blue-950/40"
+                onClick={() => navigate('/hr/employees')}
+              />
+              <ActionTile
+                icon={Sliders}
+                label="Feature Access Quick View"
+                subtitle="Why-trace timeline & temporary grant for N days"
+                badge="Access Engine"
+                badgeVariant="primary"
+                iconColor="text-purple-600 dark:text-purple-400"
+                iconBg="bg-purple-50 dark:bg-purple-950/40"
+                onClick={() => navigate('/hr/features')}
+              />
+              <ActionTile
+                icon={Megaphone}
+                label="Announcements & Broadcasts"
+                subtitle="Compose and publish to branch or profile"
+                iconColor="text-pink-600 dark:text-pink-400"
+                iconBg="bg-pink-50 dark:bg-pink-950/40"
+                onClick={() => navigate('/hr/announcements')}
+              />
+              <ActionTile
+                icon={UserMinus}
+                label="Regularization & Resignation Queues"
+                subtitle="Punch corrections & employee separation desk"
+                iconColor="text-amber-600 dark:text-amber-400"
+                iconBg="bg-amber-50 dark:bg-amber-950/40"
+                onClick={() => navigate('/hr/queues')}
+              />
+              <ActionTile
+                icon={History}
+                label="HR Audit Trail Feed"
+                subtitle="Chronological log of permissions & changes"
+                iconColor="text-teal-600 dark:text-teal-400"
+                iconBg="bg-teal-50 dark:bg-teal-950/40"
+                onClick={() => navigate('/hr/audit')}
+              />
+            </div>
+          </div>
+        )}
 
         {/* 1. Manager Supervision Hub (If Manager) */}
         {isManager && (
@@ -127,24 +232,27 @@ export const MobileMorePage: React.FC = () => {
                   onClick={() => navigate('/manager/timesheets')}
                 />
               )}
-              <ActionTile
-                icon={Users}
-                label="Direct Team Members"
-                subtitle="Roster list and contact details"
-                iconColor="text-purple-600 dark:text-purple-400"
-                iconBg="bg-purple-50 dark:bg-purple-950/40"
-                onClick={() => navigate('/manager/members')}
-              />
+              {hasFeature('MSS_APPROVALS') && (
+                <ActionTile
+                  icon={Users}
+                  label="Direct Team Members"
+                  subtitle="Roster list and contact details"
+                  iconColor="text-purple-600 dark:text-purple-400"
+                  iconBg="bg-purple-50 dark:bg-purple-950/40"
+                  onClick={() => navigate('/manager/members')}
+                />
+              )}
             </div>
           </div>
         )}
 
         {/* 2. Attendance, Shifts & Field */}
-        <div className="space-y-2.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-            Attendance & Shifts
-          </h4>
-          <div className="grid grid-cols-1 gap-2">
+        {hasAttendanceItems && (
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Attendance & Shifts
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
             {hasFeature('PUNCH') && (
               <ActionTile
                 icon={Clock}
@@ -197,143 +305,180 @@ export const MobileMorePage: React.FC = () => {
             )}
           </div>
         </div>
+        )}
 
         {/* 3. Leave & Holidays */}
-        <div className="space-y-2.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-            Leaves & Holidays
-          </h4>
-          <div className="grid grid-cols-1 gap-2">
-            {hasFeature('LEAVE') && (
-              <ActionTile
-                icon={CalendarCheck}
-                label="Leave Application & Wallets"
-                subtitle="Casual, sick, earned leaves and quotas"
-                iconColor="text-indigo-600 dark:text-indigo-400"
-                iconBg="bg-indigo-50 dark:bg-indigo-950/40"
-                onClick={() => navigate('/employee/leaves')}
-              />
-            )}
-            {hasFeature('CALENDAR') && (
-              <ActionTile
-                icon={CalendarDays}
-                label="Holiday Calendar"
-                subtitle="National, state and optional holidays"
-                iconColor="text-emerald-600 dark:text-emerald-400"
-                iconBg="bg-emerald-50 dark:bg-emerald-950/40"
-                onClick={() => navigate('/employee/calendar')}
-              />
-            )}
-            {hasFeature('BIRTHDAY_ANNIV') && (
-              <ActionTile
-                icon={Gift}
-                label="Birthdays & Work Celebrations"
-                subtitle="Team anniversaries and greetings"
-                iconColor="text-pink-600 dark:text-pink-400"
-                iconBg="bg-pink-50 dark:bg-pink-950/40"
-                onClick={() => navigate('/employee/celebrations')}
-              />
-            )}
+        {hasLeaveItems && (
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Leaves & Holidays
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              {hasFeature('LEAVE') && (
+                <ActionTile
+                  icon={CalendarCheck}
+                  label="Leave Application & Wallets"
+                  subtitle="Casual, sick, earned leaves and quotas"
+                  iconColor="text-indigo-600 dark:text-indigo-400"
+                  iconBg="bg-indigo-50 dark:bg-indigo-950/40"
+                  onClick={() => navigate('/employee/leaves')}
+                />
+              )}
+              {hasFeature('CALENDAR') && (
+                <ActionTile
+                  icon={CalendarDays}
+                  label="Holiday Calendar"
+                  subtitle="National, state and optional holidays"
+                  iconColor="text-emerald-600 dark:text-emerald-400"
+                  iconBg="bg-emerald-50 dark:bg-emerald-950/40"
+                  onClick={() => navigate('/employee/calendar')}
+                />
+              )}
+              {hasFeature('BIRTHDAY_ANNIV') && (
+                <ActionTile
+                  icon={Gift}
+                  label="Birthdays & Work Celebrations"
+                  subtitle="Team anniversaries and greetings"
+                  iconColor="text-pink-600 dark:text-pink-400"
+                  iconBg="bg-pink-50 dark:bg-pink-950/40"
+                  onClick={() => navigate('/employee/celebrations')}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 4. Claims & Finance */}
-        <div className="space-y-2.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-            Payroll & Finance
-          </h4>
-          <div className="grid grid-cols-1 gap-2">
-            {hasFeature('PAYSLIP') && (
-              <ActionTile
-                icon={Banknote}
-                label="Payslips & Tax Form 16"
-                subtitle="Monthly salary vouchers & deductions"
-                iconColor="text-emerald-600 dark:text-emerald-400"
-                iconBg="bg-emerald-50 dark:bg-emerald-950/40"
-                onClick={() => navigate('/employee/payslips')}
-              />
-            )}
-            {hasFeature('EXPENSE') && (
-              <ActionTile
-                icon={Receipt}
-                label="Expense Reimbursements"
-                subtitle="Travel, food and lodging vouchers"
-                iconColor="text-indigo-600 dark:text-indigo-400"
-                iconBg="bg-indigo-50 dark:bg-indigo-950/40"
-                onClick={() => navigate('/employee/claims')}
-              />
-            )}
-            {hasFeature('FINANCE') && (
-              <ActionTile
-                icon={CreditCard}
-                label="Salary Advances & Loans"
-                subtitle="EMI calculator and recovery status"
-                iconColor="text-purple-600 dark:text-purple-400"
-                iconBg="bg-purple-50 dark:bg-purple-950/40"
-                onClick={() => navigate('/employee/loans')}
-              />
-            )}
+        {hasFinanceItems && (
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Payroll & Finance
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              {hasFeature('PAYSLIP') && (
+                <ActionTile
+                  icon={Banknote}
+                  label="Payslips & Tax Form 16"
+                  subtitle="Monthly salary vouchers & deductions"
+                  iconColor="text-emerald-600 dark:text-emerald-400"
+                  iconBg="bg-emerald-50 dark:bg-emerald-950/40"
+                  onClick={() => navigate('/employee/payslips')}
+                />
+              )}
+              {hasFeature('EXPENSE') && (
+                <ActionTile
+                  icon={Receipt}
+                  label="Expense Reimbursements"
+                  subtitle="Travel, food and lodging vouchers"
+                  iconColor="text-indigo-600 dark:text-indigo-400"
+                  iconBg="bg-indigo-50 dark:bg-indigo-950/40"
+                  onClick={() => navigate('/employee/claims')}
+                />
+              )}
+              {hasFeature('FINANCE') && (
+                <ActionTile
+                  icon={CreditCard}
+                  label="Salary Advances & Loans"
+                  subtitle="EMI calculator and recovery status"
+                  iconColor="text-purple-600 dark:text-purple-400"
+                  iconBg="bg-purple-50 dark:bg-purple-950/40"
+                  onClick={() => navigate('/employee/loans')}
+                />
+              )}
+              {hasFeature('INCENTIVE') && (
+                <ActionTile
+                  icon={TrendingUp}
+                  label="Sales Incentives & Target Commission"
+                  subtitle="Achievement ring, tier slabs & earned payout"
+                  iconColor="text-amber-600 dark:text-amber-400"
+                  iconBg="bg-amber-50 dark:bg-amber-950/40"
+                  onClick={() => navigate('/employee/incentive')}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 5. Learning & Engagement */}
-        <div className="space-y-2.5">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
-            Learning & Culture
-          </h4>
-          <div className="grid grid-cols-1 gap-2">
-            {hasFeature('TRAINING') && (
-              <ActionTile
-                icon={GraduationCap}
-                label="LMS Courses & Safety Training"
-                subtitle="Mandatory certifications and renewal"
-                iconColor="text-indigo-600 dark:text-indigo-400"
-                iconBg="bg-indigo-50 dark:bg-indigo-950/40"
-                onClick={() => navigate('/employee/training')}
-              />
-            )}
-            {hasFeature('ENGAGEMENT') && (
-              <ActionTile
-                icon={HeartHandshake}
-                label="Company Pulse & Live Polls"
-                subtitle="Anonymous pulse survey and voting"
-                iconColor="text-rose-600 dark:text-rose-400"
-                iconBg="bg-rose-50 dark:bg-rose-950/40"
-                onClick={() => navigate('/employee/engagement')}
-              />
-            )}
-            {hasFeature('HELPDESK') && (
-              <ActionTile
-                icon={LifeBuoy}
-                label="Internal HR Helpdesk"
-                subtitle="Raise query tickets and track resolution"
-                iconColor="text-blue-600 dark:text-blue-400"
-                iconBg="bg-blue-50 dark:bg-blue-950/40"
-                onClick={() => navigate('/employee/helpdesk')}
-              />
-            )}
-            {hasFeature('POLICY') && (
-              <ActionTile
-                icon={BookOpen}
-                label="Company Policies & Handbooks"
-                subtitle="Leave, conduct and travel guidelines"
-                iconColor="text-amber-600 dark:text-amber-400"
-                iconBg="bg-amber-50 dark:bg-amber-950/40"
-                onClick={() => navigate('/employee/policies')}
-              />
-            )}
-            {hasFeature('RESIGNATION') && (
-              <ActionTile
-                icon={UserMinus}
-                label="Separation & Resignation Desk"
-                subtitle="Notice period & handover checklist"
-                iconColor="text-zinc-600 dark:text-zinc-400"
-                iconBg="bg-zinc-100 dark:bg-zinc-900"
-                onClick={() => navigate('/employee/resignation')}
-              />
-            )}
+        {hasLearningItems && (
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-1">
+              Learning & Culture
+            </h4>
+            <div className="grid grid-cols-1 gap-2">
+              {hasFeature('TRAINING') && (
+                <ActionTile
+                  icon={GraduationCap}
+                  label="LMS Courses & Safety Training"
+                  subtitle="Mandatory certifications and renewal"
+                  iconColor="text-indigo-600 dark:text-indigo-400"
+                  iconBg="bg-indigo-50 dark:bg-indigo-950/40"
+                  onClick={() => navigate('/employee/training')}
+                />
+              )}
+              {hasFeature('PERFORMANCE') && (
+                <ActionTile
+                  icon={Target}
+                  label="Performance Goals & Appraisals"
+                  subtitle="Annual review self-evaluation & OKRs"
+                  iconColor="text-indigo-600 dark:text-indigo-400"
+                  iconBg="bg-indigo-50 dark:bg-indigo-950/40"
+                  onClick={() => navigate('/employee/performance')}
+                />
+              )}
+              {hasFeature('ASSET') && (
+                <ActionTile
+                  icon={Laptop}
+                  label="Company Assets & Devices"
+                  subtitle="Assigned hardware, custody & handover"
+                  iconColor="text-emerald-600 dark:text-emerald-400"
+                  iconBg="bg-emerald-50 dark:bg-emerald-950/40"
+                  onClick={() => navigate('/employee/assets')}
+                />
+              )}
+              {hasFeature('ENGAGEMENT') && (
+                <ActionTile
+                  icon={HeartHandshake}
+                  label="Company Pulse & Live Polls"
+                  subtitle="Anonymous pulse survey and voting"
+                  iconColor="text-rose-600 dark:text-rose-400"
+                  iconBg="bg-rose-50 dark:bg-rose-950/40"
+                  onClick={() => navigate('/employee/engagement')}
+                />
+              )}
+              {hasFeature('HELPDESK') && (
+                <ActionTile
+                  icon={LifeBuoy}
+                  label="Internal HR Helpdesk"
+                  subtitle="Raise query tickets and track resolution"
+                  iconColor="text-blue-600 dark:text-blue-400"
+                  iconBg="bg-blue-50 dark:bg-blue-950/40"
+                  onClick={() => navigate('/employee/helpdesk')}
+                />
+              )}
+              {hasFeature('POLICY') && (
+                <ActionTile
+                  icon={BookOpen}
+                  label="Company Policies & Handbooks"
+                  subtitle="Leave, conduct and travel guidelines"
+                  iconColor="text-amber-600 dark:text-amber-400"
+                  iconBg="bg-amber-50 dark:bg-amber-950/40"
+                  onClick={() => navigate('/employee/policies')}
+                />
+              )}
+              {hasFeature('RESIGNATION') && (
+                <ActionTile
+                  icon={UserMinus}
+                  label="Separation & Resignation Desk"
+                  subtitle="Notice period & handover checklist"
+                  iconColor="text-zinc-600 dark:text-zinc-400"
+                  iconBg="bg-zinc-100 dark:bg-zinc-900"
+                  onClick={() => navigate('/employee/resignation')}
+                />
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* 6. System & Diagnostics */}
         <div className="space-y-2.5">
