@@ -1,8 +1,8 @@
 import React from 'react'
 
 interface StickyActionBarProps {
-  primaryLabel: string
-  onPrimaryClick: () => void
+  primaryLabel?: string
+  onPrimaryClick?: () => void
   primaryIcon?: React.ReactNode
   primaryDisabled?: boolean
   primaryVariant?: 'primary' | 'success' | 'danger'
@@ -10,6 +10,7 @@ interface StickyActionBarProps {
   onSecondaryClick?: () => void
   secondaryDisabled?: boolean
   aboveTabBar?: boolean
+  children?: React.ReactNode
 }
 
 export const StickyActionBar: React.FC<StickyActionBarProps> = ({
@@ -22,6 +23,7 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({
   onSecondaryClick,
   secondaryDisabled = false,
   aboveTabBar = false,
+  children,
 }) => {
   const getPrimaryStyle = () => {
     switch (primaryVariant) {
@@ -41,26 +43,34 @@ export const StickyActionBar: React.FC<StickyActionBarProps> = ({
       }`}
     >
       <div className="max-w-md mx-auto flex items-center gap-2.5">
-        {secondaryLabel && onSecondaryClick && (
-          <button
-            type="button"
-            onClick={onSecondaryClick}
-            disabled={secondaryDisabled}
-            className="flex-1 min-h-[48px] px-4 py-2.5 rounded-xl border border-border text-foreground font-semibold text-sm hover:bg-muted active:scale-[0.98] transition disabled:opacity-50"
-          >
-            {secondaryLabel}
-          </button>
-        )}
+        {children ? (
+          children
+        ) : (
+          <>
+            {secondaryLabel && onSecondaryClick && (
+              <button
+                type="button"
+                onClick={onSecondaryClick}
+                disabled={secondaryDisabled}
+                className="flex-1 min-h-[48px] px-4 py-2.5 rounded-xl border border-border text-foreground font-semibold text-sm hover:bg-muted active:scale-[0.98] transition disabled:opacity-50"
+              >
+                {secondaryLabel}
+              </button>
+            )}
 
-        <button
-          type="button"
-          onClick={onPrimaryClick}
-          disabled={primaryDisabled}
-          className={`flex-1 min-h-[48px] px-4 py-2.5 rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 active:scale-[0.98] transition disabled:opacity-50 ${getPrimaryStyle()}`}
-        >
-          {primaryIcon}
-          <span>{primaryLabel}</span>
-        </button>
+            {primaryLabel && onPrimaryClick && (
+              <button
+                type="button"
+                onClick={onPrimaryClick}
+                disabled={primaryDisabled}
+                className={`flex-1 min-h-[48px] px-4 py-2.5 rounded-xl font-bold text-sm shadow-md flex items-center justify-center gap-2 active:scale-[0.98] transition disabled:opacity-50 ${getPrimaryStyle()}`}
+              >
+                {primaryIcon}
+                <span>{primaryLabel}</span>
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

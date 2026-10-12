@@ -14,6 +14,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAccess } from '@/access/useAccess'
 import { useDemo } from '@/context/DemoContext'
+import { useWorkflow } from '@/context/WorkflowContext'
 
 export interface TabItem {
   id: string
@@ -29,8 +30,10 @@ export const BottomTabBar: React.FC = () => {
   const navigate = useNavigate()
   const { hasFeature } = useAccess()
   const { settings } = useDemo()
+  const { requests } = useWorkflow()
 
   const isManager = settings.role === 'Manager'
+  const pendingApprovalsCount = requests.filter((r) => r.status === 'pending').length
 
   // Build the 5 tabs dynamically based on effective access & role
   const getTabs = (): TabItem[] => {
@@ -50,7 +53,7 @@ export const BottomTabBar: React.FC = () => {
           label: 'Approvals',
           to: '/manager/approvals',
           icon: ClipboardCheck,
-          badge: 4, // 4 pending manager approvals
+          badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : undefined,
           featureCode: 'MSS_APPROVALS',
         })
       }

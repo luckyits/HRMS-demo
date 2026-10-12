@@ -10,6 +10,13 @@ interface SwipeableCardProps {
   onApprove: (id: string) => void
   onReject: (id: string) => void
   statusBadge?: string
+  onClick?: (id: string) => void
+  selectable?: boolean
+  isSelected?: boolean
+  onToggleSelect?: (id: string) => void
+  isSelfApprovalBlocked?: boolean
+  delegationBadge?: string
+  isEscalated?: boolean
 }
 
 export const SwipeableCard: React.FC<SwipeableCardProps> = ({
@@ -20,6 +27,13 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
   onApprove,
   onReject,
   statusBadge,
+  onClick,
+  selectable = false,
+  isSelected = false,
+  onToggleSelect,
+  isSelfApprovalBlocked = false,
+  delegationBadge,
+  isEscalated = false,
 }) => {
   const [dragOffset, setDragOffset] = useState(0)
   const [isSwiped, setIsSwiped] = useState<'approved' | 'rejected' | null>(null)
@@ -98,22 +112,75 @@ export const SwipeableCard: React.FC<SwipeableCardProps> = ({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
         style={{ transform: `translateX(${dragOffset}px)` }}
-        className="relative bg-card border border-border rounded-2xl p-4 shadow-2xs transition-transform duration-75"
+        className={`relative bg-card border border-border rounded-2xl p-4 shadow-2xs transition-transform duration-75 ${
+          isSelected ? 'ring-2 ring-primary border-primary bg-primary/5' : ''
+        }`}
       >
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <h4 className="text-sm font-bold text-foreground">{title}</h4>
-            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+        {/* Top Badges (Delegation, Escalation, Self-Approval Blocked) */}
+        {(isSelfApprovalBlocked || delegationBadge || isEscalated) && (
+          <div className="flex flex-wrap gap-1.5 mb-2.5">
+            {isSelfApprovalBlocked && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">
+                Skipped to next level (self-approval blocked)
+              </span>
+            )}
+            {delegationBadge && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20">
+                {delegationBadge}
+              </span>
+            )}
+            {isEscalated && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-rose-500/10 text-rose-600 border border-rose-500/20">
+                Escalated (&gt;24h pending)
+              </span>
+            )}
           </div>
+        )}
+
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-start gap-2.5 min-w-0">
+            {selectable && (
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={(e) => {
+                  e.stopPropagation()
+                  onToggleSelect?.(id)
+                }}
+                className="w-4 h-4 rounded text-primary accent-primary mt-0.5 shrink-0"
+              />
+            )}
+            <div
+              onClick={() => {
+                if (Math.abs(dragOffset) < 10 && onClick) {
+                  onClick(id)
+                }
+              }}
+              className="cursor-pointer min-w-0"
+            >
+              <h4 className="text-sm font-bold text-foreground hover:text-primary transition">
+                {title}
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+            </div>
+          </div>
+
           {statusBadge && (
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 shrink-0">
               {statusBadge}
             </span>
           )}
         </div>
 
         {details.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border/60 text-xs">
+          <div
+            onClick={() => {
+              if (Math.abs(dragOffset) < 10 && onClick) {
+                onClick(id)
+              }
+            }}
+            className="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-border/60 text-xs cursor-pointer"
+          >
             {details.map((d, i) => (
               <div key={i}>
                 <span className="text-[11px] text-muted-foreground block truncate">

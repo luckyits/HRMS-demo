@@ -32,6 +32,7 @@ interface EssContextType {
   leaveRequests: LeaveRequest[]
   applyLeave: (req: Omit<LeaveRequest, 'id' | 'status' | 'submittedAt'>) => void
   cancelLeaveRequest: (id: string) => void
+  updateLeaveRequestStatus: (id: string, status: 'approved' | 'rejected', comments?: string) => void
 
   // Celebrations
   celebrations: CelebrationItem[]
@@ -228,6 +229,21 @@ export const EssProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     )
   }
 
+  const updateLeaveRequestStatus = (id: string, status: 'approved' | 'rejected', comments?: string) => {
+    setLeaveRequests((prev) =>
+      prev.map((r) => {
+        if (r.id === id || (id === 'REQ-101' && (r.id === 'LV-901' || r.status === 'pending'))) {
+          return {
+            ...r,
+            status,
+            managerComments: comments || (status === 'approved' ? 'Approved by Vikram Malhotra.' : 'Rejected by Vikram Malhotra.'),
+          }
+        }
+        return r
+      })
+    )
+  }
+
   const uploadDocument = (id: string, fileName: string) => {
     const now = new Date().toISOString().split('T')[0]
     setDocuments((prev) =>
@@ -359,6 +375,7 @@ export const EssProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         leaveRequests,
         applyLeave,
         cancelLeaveRequest,
+        updateLeaveRequestStatus,
         celebrations,
         sendWish,
         documents,
