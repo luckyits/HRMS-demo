@@ -1,5 +1,5 @@
-// Basic PWA Service Worker for Universal HRMS
-const CACHE_NAME = 'hrms-app-shell-v1'
+// PWA Service Worker for Universal HRMS
+const CACHE_NAME = 'hrms-app-shell-v2'
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -29,6 +29,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return
+  if (!event.request.url.startsWith('http')) return
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -36,14 +37,14 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse
       }
 
-      return fetch(event.request)
-        .then((networkResponse) => {
-          return networkResponse
-        })
-        .catch(() => {
-          // Offline fallback
+      return fetch(event.request).catch((err) => {
+        // IMPORTANT: Only return index.html fallback for top-level page navigations.
+        // Returning HTML for failed JS/CSS asset requests causes "Unexpected token '<'" white screen on mobile.
+        if (event.request.mode === 'navigate') {
           return caches.match('/index.html')
-        })
+        }
+        return Promise.reject(err)
+      })
     })
   )
 })
