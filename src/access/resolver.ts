@@ -287,7 +287,7 @@ export function getEffectiveAccess(
   companyType?: CompanyType
 ): Record<string, AccessResolutionResult> {
   const result: Record<string, AccessResolutionResult> = {}
-  for (const feature of Object.keys(FEATURE_MAP)) {
+  for (const feature of FEATURE_MAP.keys()) {
     result[feature] = resolveAccess(employee, feature, companyType)
   }
   return result

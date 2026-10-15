@@ -16,11 +16,18 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {
-            // SW registration silently bypassed in non-supported dev env
+        // In local development, unregister old service workers so Vite HMR and dev server are not intercepted
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const registration of registrations) {
+              registration.unregister()
+            }
           })
-        })
+        } else {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {})
+          })
+        }
       }
     </script>
   </body>
