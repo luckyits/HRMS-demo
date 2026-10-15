@@ -17,15 +17,17 @@ import {
 import { MobileHeader } from '@/mobile/components/MobileHeader'
 import { MobileCalendar } from '@/mobile/components/MobileCalendar'
 import { BottomSheet } from '@/mobile/components/BottomSheet'
+import { MobilePunchFlowModal } from '@/mobile/components/MobilePunchFlowModal'
 import { useAttendance } from '@/context/AttendanceContext'
 import { useAccess } from '@/access/useAccess'
 import type { DayAttendance } from '@/mock/attendance'
 
 export const MobileAttendancePage: React.FC = () => {
   const navigate = useNavigate()
-  const { monthDays } = useAttendance()
+  const { monthDays, isPunchedIn, punchInTime } = useAttendance()
   const { hasFeature } = useAccess()
 
+  const [showPunchModal, setShowPunchModal] = useState(false)
   const [selectedDateStr, setSelectedDateStr] = useState<string>('2026-10-05') // default to night shift example day
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [selectedDay, setSelectedDay] = useState<DayAttendance | null>(() => {
@@ -102,6 +104,54 @@ export const MobileAttendancePage: React.FC = () => {
       />
 
       <div className="p-4 space-y-4">
+        {/* Quick Punch In / Out Action Card */}
+        {hasFeature('PUNCH') && (
+          <div className="p-4 rounded-3xl bg-gradient-to-r from-card via-card to-primary/5 border border-border shadow-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div
+                className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                  isPunchedIn
+                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                    : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                <Clock className="w-6 h-6" />
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isPunchedIn
+                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {isPunchedIn ? 'On Duty' : 'Off Duty'}
+                  </span>
+                  <span className="text-xs text-muted-foreground truncate">
+                    {isPunchedIn ? `Since ${punchInTime}` : 'Not punched in'}
+                  </span>
+                </div>
+                <h4 className="text-sm font-black text-foreground mt-0.5 truncate">
+                  {isPunchedIn ? 'Shift In Progress' : 'Ready to Punch In'}
+                </h4>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowPunchModal(true)}
+              className={`px-4 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider text-white shadow-md active:scale-95 transition-all shrink-0 ${
+                isPunchedIn
+                  ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-600/20'
+                  : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
+              }`}
+            >
+              {isPunchedIn ? 'Punch Out' : 'Punch In'}
+            </button>
+          </div>
+        )}
+
         {/* Summary Metric Chips */}
         <div className="grid grid-cols-3 gap-2">
           <div className="p-3 rounded-2xl bg-card border border-border shadow-2xs flex flex-col">
@@ -432,6 +482,16 @@ export const MobileAttendancePage: React.FC = () => {
           </div>
         )}
       </BottomSheet>
+
+      {/* Biometric & Geofence Punch Flow Modal */}
+      <MobilePunchFlowModal
+        isOpen={showPunchModal}
+        onClose={() => setShowPunchModal(false)}
+        punchType={isPunchedIn ? 'OUT' : 'IN'}
+        onSuccess={() => {
+          setShowPunchModal(false)
+        }}
+      />
     </div>
   )
 }
